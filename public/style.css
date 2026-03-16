@@ -1,0 +1,20 @@
+body{
+background-color:#f5f5f5;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+h1{
+margin-bottom:10px;
+}
+
+#results li{
+margin-bottom:6px;
+}
+
+button{
+font-weight:bold;
+}
+
+#errorMessage{
+font-weight:bold;
+}
