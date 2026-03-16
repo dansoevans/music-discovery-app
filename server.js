@@ -1,44 +1,51 @@
-const express = require("express");
-const fetch = require("node-fetch");
+async function searchArtist() {
 
-const app = express();
+const artistName = document.getElementById("artistInput").value;
+const resultsList = document.getElementById("results");
+const errorBox = document.getElementById("errorMessage");
 
-app.use(express.static("public"));
+resultsList.innerHTML = "";
+errorBox.textContent = "";
 
-const PORT = 3000;
-
-app.get("/api/search", async (req,res)=>{
-
-const artist = req.query.artist;
-
-if(!artist){
-return res.status(400).json({error:"Artist name required"});
+if (artistName.trim() === "") {
+errorBox.textContent = "Please enter an artist name.";
+return;
 }
 
-try{
+try {
 
-const url = `https://musicbrainz.org/ws/2/artist/?query=${artist}&fmt=json`;
+const url = `https://musicbrainz.org/ws/2/artist/?query=${encodeURIComponent(artistName)}&fmt=json`;
 
-const response = await fetch(url);
+const response = await fetch(url, {
+headers: {
+"User-Agent": "CSCI3172-Lab5-App"
+}
+});
 
 const data = await response.json();
 
-const artists = data.artists.slice(0,10).map(a=>({
-name:a.name
-}));
+if (!data.artists || data.artists.length === 0) {
+errorBox.textContent = "No results found.";
+return;
+}
 
-res.json(artists);
+data.artists.slice(0,10).forEach(artist => {
 
-}catch(error){
+const li = document.createElement("li");
+
+li.className = "list-group-item";
+
+li.textContent = artist.name;
+
+resultsList.appendChild(li);
+
+});
+
+} catch (error) {
 
 console.error(error);
-
-res.status(500).json({error:"API request failed"});
+errorBox.textContent = "Error retrieving artist data.";
 
 }
 
-});
-
-app.listen(PORT,()=>{
-console.log(`Server running on port ${PORT}`);
-});
+}
